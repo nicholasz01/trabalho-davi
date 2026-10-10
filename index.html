@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Barbearia</title>
+
+<style>
+/* Trabalho de programação - app de barbearia */
+/* as telas seguem as tabelas do meu banco: clientes, cortes e agendamentos */
+
+body {
+  margin: 0;
+  background: #000;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+#celular {
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  margin: 0 auto;
+  background: #111;
+  position: relative;
+  overflow: hidden;
+}
+
+/* cada tela fica escondida, só mostra a que tem a classe "ativa" */
+.tela {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding-bottom: 40px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s;
+}
+
+.tela.ativa {
+  opacity: 1;
+  visibility: visible;
+}
+
+h1 {
+  font-family: Georgia, serif;
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+h3 {
+  margin-top: 25px;
+  margin-bottom: 8px;
+}
+
+.cinza {
+  color: #999;
+  font-size: 13px;
+}
+
+.dourado {
+  color: #e3c07a;
+}
+
+.botao {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: #e3c07a;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.botao:active {
+  transform: scale(0.95);
+}
+
+.botaopequeno {
+  background: #e3c07a;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.voltar {
+  background: none;
+  border: none;
+  color: #e3c07a;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 15px;
+}
+
+.caixa {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 10px;
+}
+
+/* lista de cortes (tabela cortes) */
+.corte {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.corte .texto {
+  width: 60%;
+}
+
+.preco {
+  color: #e3c07a;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: right;
+}
+
+/* campos do cliente (tabela clientes) */
+input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 13px;
+  margin-bottom: 8px;
+  color: white;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #e3c07a;
+}
+
+/* serviço, dias e horários */
+.opcoes {
+  display: flex;
+  justify-content: space-between;
+}
+
+.opcao {
+  width: 48%;
+  background: #1e1e1e;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 13px 0;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.opcao.escolhido {
+  background: #e3c07a;
+  color: black;
+  font-weight: bold;
+}
+
+.dia {
+  width: 31%;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 10px 0;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dia.escolhido {
+  background: #e3c07a;
+  color: black;
+  transform: translateY(-4px);
+}
+
+.horarios {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.hora {
+  width: 31%;
+  background: #1e1e1e;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px 0;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.hora.escolhido {
+  background: #e3c07a;
+  color: black;
+  transform: scale(1.08);
+}
+
+.hora.ocupado {
+  opacity: 0.3;
+  text-decoration: line-through;
+  cursor: default;
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 14px;
+}
+
+.linha span {
+  color: #999;
+}
+
+/* tela confirmado */
+.centro {
+  text-align: center;
+}
+
+.circulo {
+  width: 100px;
+  height: 100px;
+  border: 3px solid #4cd68a;
+  border-radius: 50%;
+  margin: 30px auto;
+  position: relative;
+}
+
+/* o "certinho" feito com borda girada */
+.certo {
+  position: absolute;
+  left: 33px;
+  top: 18px;
+  width: 22px;
+  height: 45px;
+  border-right: 6px solid #4cd68a;
+  border-bottom: 6px solid #4cd68a;
+  transform: rotate(45deg);
+}
+
+.tela.ativa .circulo {
+  animation: aparecer 0.6s;
+}
+
+@keyframes aparecer {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.sql {
+  background: #000;
+  border: 1px dashed #555;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 15px;
+  text-align: left;
+  font-family: monospace;
+  font-size: 11px;
+  color: #4cd68a;
+  word-break: break-word;
+}
+
+#aviso {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e3c07a;
+  color: black;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 10;
+  transition: top 0.4s;
+  white-space: nowrap;
+}
+
+#aviso.mostrar {
+  top: 20px;
+}
+</style>
+</head>
+
+<body>
+<div id="celular">
+
+<div id="aviso">aviso</div>
+
+<!-- ================= TELA 1: CORTES (tabela cortes) ================= -->
+<div class="tela ativa" id="inicio">
+  <h1>Nossos cortes</h1>
+  <p class="cinza">Escolha o corte e agende seu horário</p>
+  <div id="listaCortes"></div>
+</div>
+
+<!-- ================= TELA 2: AGENDAR (tabelas clientes e agendamentos) ================= -->
+<div class="tela" id="agendar">
+  <button class="voltar" onclick="mostrarTela('inicio')">&lt; Voltar</button>
+  <h1>Agendar horário</h1>
+  <p class="cinza" id="infoCorte"></p>
+
+  <h3>Seus dados</h3>
+  <input type="text" id="nome" placeholder="Nome">
+  <input type="tel" id="telefone" placeholder="Telefone (ex: 45999998741)">
+  <input type="email" id="email" placeholder="E-mail">
+
+  <h3>Serviço</h3>
+  <div class="opcoes">
+    <div class="opcao escolhido" id="s-Corte" onclick="escolherServico('Corte')">Corte</div>
+    <div class="opcao" id="s-Corte + Barba" onclick="escolherServico('Corte + Barba')">Corte + Barba</div>
+  </div>
+
+  <h3>Outubro de 2026</h3>
+  <div class="opcoes">
+    <div class="dia" id="d-20" onclick="escolherDia(20)"><small>Ter</small><br><b>20</b></div>
+    <div class="dia escolhido" id="d-21" onclick="escolherDia(21)"><small>Qua</small><br><b>21</b></div>
+    <div class="dia" id="d-22" onclick="escolherDia(22)"><small>Qui</small><br><b>22</b></div>
+  </div>
+
+  <h3>Horários disponíveis</h3>
+  <div class="horarios" id="listaHorarios"></div>
+
+  <button class="botao" onclick="confirmar()">Confirmar agendamento</button>
+</div>
+
+<!-- ================= TELA 3: CONFIRMADO ================= -->
+<div class="tela centro" id="confirmado">
+  <div class="circulo"><div class="certo"></div></div>
+  <h1>TUDO CERTO!</h1>
+  <p class="cinza" id="c-texto"></p>
+
+  <div class="caixa" style="text-align:left">
+    <div class="linha"><span>Cliente</span><b id="c-nome"></b></div>
+    <div class="linha"><span>Corte</span><b id="c-corte"></b></div>
+    <div class="linha"><span>Serviço</span><b id="c-servico"></b></div>
+    <div class="linha"><span>Data</span><b id="c-data"></b></div>
+    <div class="linha"><span>Horário</span><b id="c-hora"></b></div>
+    <div class="linha"><span>Preço</span><b class="dourado" id="c-preco"></b></div>
+    <div class="linha"><span>Status</span><b>Agendado</b></div>
+  </div>
+
+  <div class="sql" id="c-sql"></div>
+
+  <button class="botao" onclick="novoAgendamento()">Voltar ao início</button>
+</div>
+
+</div>
+
+<script>
+// ---------- os dados da tabela cortes ----------
+var cortes = [
+  { id: 1, nome: 'Corte Americano', preco: 30, descricao: 'Corte clássico com laterais baixas e acabamento tradicional' },
+  { id: 2, nome: 'Low Fade', preco: 35, descricao: 'Degradê baixo nas laterais' },
+  { id: 3, nome: 'Mid Fade', preco: 35, descricao: 'Degradê médio nas laterais' },
+  { id: 4, nome: 'High Fade', preco: 40, descricao: 'Degradê alto nas laterais' },
+  { id: 5, nome: 'Moicano', preco: 40, descricao: 'Corte com laterais raspadas e volume central' }
+];
+
+// horários da tabela agendamentos (dia 21/10/2026)
+// o das 15:00 estava Cancelado, então ficou livre
+var horarios = ['08:00', '09:00', '09:45', '10:30', '11:05', '11:15', '14:00', '14:10', '15:00', '15:35', '16:00', '17:00'];
+var ocupados21 = ['08:00', '09:00', '09:45', '10:30', '11:05', '11:15', '14:00', '14:10', '15:35'];
+
+// ---------- variáveis do pedido ----------
+var corteEscolhido = cortes[0];
+var servico = 'Corte';
+var dia = 21;
+var hora = '';
+
+// ---------- função que troca de tela ----------
+function mostrarTela(nome) {
+  var telas = document.getElementsByClassName('tela');
+  for (var i = 0; i < telas.length; i++) {
+    telas[i].classList.remove('ativa');
+  }
+  document.getElementById(nome).classList.add('ativa');
+  document.getElementById(nome).scrollTop = 0;
+}
+
+function mostrarAviso(texto) {
+  var aviso = document.getElementById('aviso');
+  aviso.innerHTML = texto;
+  aviso.classList.add('mostrar');
+  setTimeout(function () {
+    aviso.classList.remove('mostrar');
+  }, 2000);
+}
+
+// ---------- tela 1: monta a lista de cortes ----------
+function montarCortes() {
+  var html = '';
+  for (var i = 0; i < cortes.length; i++) {
+    html += '<div class="corte">';
+    html += '<div class="texto"><b>' + cortes[i].nome + '</b><br>';
+    html += '<span class="cinza">' + cortes[i].descricao + '</span></div>';
+    html += '<div><div class="preco">R$ ' + cortes[i].preco + ',00</div>';
+    html += '<button class="botaopequeno" onclick="escolherCorte(' + i + ')">Agendar</button></div>';
+    html += '</div>';
+  }
+  document.getElementById('listaCortes').innerHTML = html;
+}
+
+function escolherCorte(posicao) {
+  corteEscolhido = cortes[posicao];
+  hora = '';
+  document.getElementById('infoCorte').innerHTML = corteEscolhido.nome + ' - R$ ' + corteEscolhido.preco + ',00';
+  montarHorarios();
+  mostrarTela('agendar');
+}
+
+// ---------- tela 2 ----------
+function escolherServico(nome) {
+  document.getElementById('s-Corte').classList.remove('escolhido');
+  document.getElementById('s-Corte + Barba').classList.remove('escolhido');
+  document.getElementById('s-' + nome).classList.add('escolhido');
+  servico = nome;
+}
+
+function escolherDia(numero) {
+  for (var i = 20; i <= 22; i++) {
+    document.getElementById('d-' + i).classList.remove('escolhido');
+  }
+  document.getElementById('d-' + numero).classList.add('escolhido');
+  dia = numero;
+  hora = '';
+  montarHorarios();
+}
+
+function montarHorarios() {
+  var html = '';
+  for (var i = 0; i < horarios.length; i++) {
+    var classe = 'hora';
+    var clique = 'escolherHora(\'' + horarios[i] + '\')';
+    // só o dia 21 tem horário ocupado no banco
+    if (dia == 21 && ocupados21.indexOf(horarios[i]) != -1) {
+      classe = 'hora ocupado';
+      clique = '';
+    }
+    if (horarios[i] == hora) {
+      classe = 'hora escolhido';
+    }
+    html += '<button class="' + classe + '" onclick="' + clique + '">' + horarios[i] + '</button>';
+  }
+  document.getElementById('listaHorarios').innerHTML = html;
+}
+
+function escolherHora(h) {
+  hora = h;
+  montarHorarios();
+}
+
+function confirmar() {
+  var nome = document.getElementById('nome').value;
+  var telefone = document.getElementById('telefone').value;
+  var email = document.getElementById('email').value;
+
+  // verificações básicas
+  if (nome == '' || telefone == '' || email == '') {
+    mostrarAviso('Preencha nome, telefone e e-mail');
+    return;
+  }
+  if (hora == '') {
+    mostrarAviso('Escolha um horário');
+    return;
+  }
+
+  var data = '2026-10-' + dia;
+
+  document.getElementById('c-texto').innerHTML = 'Seu horário foi agendado, ' + nome + '. Enviaremos um lembrete antes do atendimento.';
+  document.getElementById('c-nome').innerHTML = nome;
+  document.getElementById('c-corte').innerHTML = corteEscolhido.nome;
+  document.getElementById('c-servico').innerHTML = servico;
+  document.getElementById('c-data').innerHTML = dia + '/10/2026';
+  document.getElementById('c-hora').innerHTML = hora;
+  document.getElementById('c-preco').innerHTML = 'R$ ' + corteEscolhido.preco + ',00';
+
+  // mostra o comando SQL que seria usado no banco
+  document.getElementById('c-sql').innerHTML =
+    'INSERT INTO agendamentos (id_cliente, id_corte, data_agendamento, horario, servico, status) VALUES (' +
+    '(novo cliente), ' + corteEscolhido.id + ', \'' + data + '\', \'' + hora + '\', \'' + servico + '\', \'Agendado\');';
+
+  mostrarTela('confirmado');
+}
+
+function novoAgendamento() {
+  document.getElementById('nome').value = '';
+  document.getElementById('telefone').value = '';
+  document.getElementById('email').value = '';
+  mostrarTela('inicio');
+}
+
+// começa montando a lista de cortes
+montarCortes();
+</script>
+</body>
+</html>
